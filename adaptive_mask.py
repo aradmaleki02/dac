@@ -11,20 +11,22 @@ import torch.nn as nn
 from kneed import KneeLocator
 from multiprocessing import Pool
 
+
 def get_quantile_masks(heat_map, probs):
     masks = []
-    quantiles = np.vsplit(np.quantile(heat_map, probs, axis=(1,2)), len(probs))
+    quantiles = np.vsplit(np.quantile(heat_map, probs, axis=(1, 2)), len(probs))
     for quantile in quantiles:
-        quantile = quantile.reshape(quantile.shape[1], 1,1)
+        quantile = quantile.reshape(quantile.shape[1], 1, 1)
         masks.append(mask_heatmap_using_threshold(heat_map, quantile))
     return masks
 
+
 def mask_heatmap_using_threshold(heat_maps, k):
-  ret = heat_maps >= k
-  return np.expand_dims(ret, 1)
+    ret = heat_maps >= k
+    return np.expand_dims(ret, 1)
 
 
-def save_masks (losses, path, heat_maps, save_dir):
+def save_masks(losses, path, heat_maps, save_dir):
     range = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
     kneedle = KneeLocator(range, losses, online=True, S=1.0, curve="convex", direction="increasing")
     t = kneedle.elbow
@@ -41,7 +43,10 @@ def main(args):
     base_model = ResNet50().to(device)
     base_model.load_state_dict(torch.load(args.model_path))
 
-    trainloader, valloader, testloader = get_loaders(dataset = args.dataset, path=args.data_path, batch_size=args.batch_size, get_mask = False, get_names = True)
+    print(f"Model loaded from {args.model_path}!")
+
+    trainloader, valloader, testloader = get_loaders(dataset=args.dataset, path=args.data_path,
+                                                     batch_size=args.batch_size, get_mask=False, get_names=True)
 
     save_dir = os.path.join(args.data_path, f'masks_seed{args.seed}/')
 
@@ -56,7 +61,7 @@ def main(args):
     )
 
     for loader in [trainloader, valloader, testloader]:
-        for (batch, (image, label,_, path)) in enumerate(tqdm(loader)):
+        for (batch, (image, label, _, path)) in enumerate(tqdm(loader)):
             pool = Pool()
             image = image.to(device)
             label = label.to(device)
@@ -74,12 +79,12 @@ def main(args):
                 loss = criterion(base_model(masked), label)
                 losses.append(loss.unsqueeze(1).detach().cpu().numpy())
 
-            losses = np.concatenate(losses, axis = 1)
+            losses = np.concatenate(losses, axis=1)
 
             losses = np.vsplit(losses, losses.shape[0])
             losses = [list(x.squeeze()) for x in losses]
 
-            pool.starmap(save_masks, zip(losses, path, heat_maps, [save_dir]*len(path)))
+            pool.starmap(save_masks, zip(losses, path, heat_maps, [save_dir] * len(path)))
             pool.close()
 
 
@@ -102,7 +107,5 @@ if __name__ == "__main__":
     random.seed(args.seed)
     np.random.seed(args.seed)
     torch.backends.cudnn.deterministic = True
-
-
 
     main(args)
