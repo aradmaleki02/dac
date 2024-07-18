@@ -48,7 +48,7 @@ def main(args):
     trainloader, valloader, testloader = get_loaders(dataset=args.dataset, path=args.data_path,
                                                      batch_size=args.batch_size, get_mask=False, get_names=True)
 
-    save_dir = os.path.join(args.data_path, f'masks_seed{args.seed}/')
+    save_dir = f'masks_seed_{args.seed}'
 
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
