@@ -45,6 +45,8 @@ class WaterbirdDataset(Dataset):
         self.y_one_hot = nn.functional.one_hot(y_array, num_classes=2).type(torch.FloatTensor)
         print(self.y_one_hot.shape)
 
+        self.filename_array = self.filename_array[:100]
+
     def __len__(self):
         return len(self.filename_array)
 
