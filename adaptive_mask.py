@@ -41,9 +41,9 @@ def main(args):
     device = torch.device('cuda')
 
     base_model = ResNet50().to(device)
-    base_model.load_state_dict(torch.load(args.model_path))
+    # base_model.load_state_dict(torch.load(args.model_path))
 
-    print(f"Model loaded from {args.model_path}!")
+    # print(f"Model loaded from {args.model_path}!")
 
     trainloader, valloader, testloader = get_loaders(dataset=args.dataset, path=args.data_path,
                                                      batch_size=args.batch_size, get_mask=False, get_names=True)
