@@ -22,7 +22,7 @@ def main(args):
     model = ResNet50().to(device)
 
     if not args.experiment == 'ERM':
-        model.load_state_dict(torch.load(args.model_path))
+        # model.load_state_dict(torch.load(args.model_path))
 
         model.eval()
         print('acc of the ERM model on the test set:')
