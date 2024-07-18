@@ -29,7 +29,7 @@ def main(args):
         test(testloader, model, args)
 
         base_model = ResNet50().to(device)
-        base_model.load_state_dict(torch.load(args.model_path))
+        # base_model.load_state_dict(torch.load(args.model_path))
 
         t = compute_loss_quantiles(trainloader, base_model, args.quantile)
         print('loss threshold', t)
