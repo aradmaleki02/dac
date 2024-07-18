@@ -55,7 +55,6 @@ class WaterbirdDataset(Dataset):
             self.dataset_dir,
             self.filename_array[idx])
         img = Image.open(img_filename).convert('RGB')
-        img.save('test.jpg')
         img = self.transform(img)
 
 
@@ -74,8 +73,6 @@ class WaterbirdDataset(Dataset):
         if self.get_names:
             name = self.filename_array[idx].replace('/', '_')
             ret.append(name)
-
-        print(tuple(ret))
 
         return tuple(ret)
 
