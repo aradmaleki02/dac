@@ -7,6 +7,7 @@ import numpy as np
 import os
 from PIL import Image
 import pandas as pd
+import random
 
 
 class WaterbirdDataset(Dataset):
@@ -32,6 +33,9 @@ class WaterbirdDataset(Dataset):
         self.metadata_df = self.metadata_df[self.metadata_df['split'] == self.split_dict[self.split]]
         cols = self.metadata_df.columns
         arr = self.metadata_df.to_numpy()
+        ## random shuffle arr using seed 10
+        random.seed(10)
+        random.shuffle(arr)
         new_arr = []
         wbg = 0
         lbg = 0
@@ -44,6 +48,8 @@ class WaterbirdDataset(Dataset):
                     wbg += 1
                     new_arr.append(item)
         self.metadata_df = pd.DataFrame(new_arr, columns=cols)
+        ## save the new metadata
+        self.metadata_df.to_csv(f'new_df_{split}', index=False)
         y_array = torch.Tensor(np.array(self.metadata_df['y'].values)).type(torch.LongTensor)
         print(y_array.shape)
         self.y_array = self.metadata_df['y'].values
@@ -58,7 +64,6 @@ class WaterbirdDataset(Dataset):
         self.y_one_hot = nn.functional.one_hot(y_array, num_classes=2).type(torch.FloatTensor)
         print(self.y_one_hot.shape)
 
-        self.filename_array = self.filename_array[:100]
 
     def __len__(self):
         return len(self.filename_array)

@@ -32,7 +32,10 @@ def test(dataset, model, args, device = torch.device('cuda')):
     all_correct = 0
     all_totals = 0
     for env_num in range(args.num_test_envs):
-        avg_acc_envs[env_num] = round(corrects_envs[env_num] / totals_envs[env_num], args.num_test_envs)
+        try:
+            avg_acc_envs[env_num] = round(corrects_envs[env_num] / totals_envs[env_num], args.num_test_envs)
+        except:
+            avg_acc_envs[env_num] = 0
         print(f"env {env_num}, acc: {avg_acc_envs[env_num]}")
         all_correct += corrects_envs[env_num]
         all_totals += totals_envs[env_num]
