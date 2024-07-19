@@ -30,7 +30,20 @@ class WaterbirdDataset(Dataset):
         self.metadata_df = pd.read_csv(
             os.path.join(self.dataset_dir, 'metadata.csv'))
         self.metadata_df = self.metadata_df[self.metadata_df['split'] == self.split_dict[self.split]]
-
+        cols = self.metadata_df.columns
+        arr = self.metadata_df.to_numpy()
+        new_arr = []
+        wbg = 0
+        lbg = 0
+        for item in arr:
+            if item[2] == 1:
+                if item[4] == 0 and lbg < 20:
+                    lbg += 1
+                    new_arr.append(item)
+                elif item[4] == 1 and wbg < 100:
+                    wbg += 1
+                    new_arr.append(item)
+        self.metadata_df = pd.DataFrame(new_arr, columns=cols)
         y_array = torch.Tensor(np.array(self.metadata_df['y'].values)).type(torch.LongTensor)
         print(y_array.shape)
         self.y_array = self.metadata_df['y'].values
